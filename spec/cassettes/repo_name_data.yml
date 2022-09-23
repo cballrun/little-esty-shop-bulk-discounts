@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api.github.com/repos/cece-132/little-esty-shop/
+    uri: https://api.github.com/repos/cece-132/little-esty-shop
     body:
       encoding: US-ASCII
       string: ''

@@ -67,5 +67,4 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem "ruby-lsp", "~> 0.3.2", :group => :development
 
-gem 'figaro'
 gem 'httparty'
