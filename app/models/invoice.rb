@@ -40,7 +40,9 @@ class Invoice < ApplicationRecord
   end
 
   def discount_amount
-    
+    invoice_items
+    .joins(:bulk_discounts)
+    # binding.pry
   end
 
   def total_invoice_revenue_dollars 

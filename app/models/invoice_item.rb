@@ -9,6 +9,8 @@ class InvoiceItem < ApplicationRecord
 
   belongs_to :item
   belongs_to :invoice
+  has_one :merchant, through: :item
+  has_one :bulk_discounts, through: :merchant
 
   def self.unshipped_invoice_items
     where.not(status: 2)
