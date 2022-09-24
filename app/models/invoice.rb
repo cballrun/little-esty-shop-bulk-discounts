@@ -40,7 +40,7 @@ class Invoice < ApplicationRecord
   end
 
   def discount_amount
-
+    
   end
 
   def total_invoice_revenue_dollars 
