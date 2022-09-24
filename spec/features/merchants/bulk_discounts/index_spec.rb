@@ -28,6 +28,12 @@ RSpec.describe 'the Merchant Bulk Discounts Index' do
     end
   end
 
+  describe 'links' do
+    it 'each bulk discount links to that bulk discounts show page' do
+      expect(page).to have_link("View This Bulk Discount Show Page", count: 3)
+    end
+  end
+
 
   
 

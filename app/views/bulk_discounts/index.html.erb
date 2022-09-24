@@ -4,5 +4,6 @@
   <div id= "discount_<%=discount.id %>" > 
   <p> Percent Discounted: <%= discount.percentage %>%  </p>
   <p> Quantity Threshold: <%= discount.quantity %> </p>
+  <p> <%= link_to "View This Bulk Discount Show Page", merchant_bulk_discounts_show_path(@merchant) %> </p>
   </div>
 <%end%>
