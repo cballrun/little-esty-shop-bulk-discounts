@@ -3,5 +3,6 @@
 <section id = "discount_info" >
   <p> Quantity Threshold: <%= @bulk_discount.quantity %> </p >
   <p> Discount Percentage: <%= @bulk_discount.percentage %>% </p>
-
 </section>
+
+<%= link_to "Edit This Bulk Discount", edit_merchant_bulk_discount_path(@bulk_discount.merchant) %>
