@@ -177,5 +177,15 @@ RSpec.describe Invoice, type: :model do
       expect(invoices[1].total_invoice_revenue_dollars).to eq(120.00)
       expect(invoices[2].total_invoice_revenue_dollars).to eq(270.00)
     end
+
+    it 'calculates the total invoice discount' do
+      merchant = create(:merchant)
+      invoices = create_list(:invoice, 3)
+      binding.pry
+      # inv_items_0 = create_list(:invoice_item, 3, invoice: invoices[0], unit_price: 1000, quantity: 3)
+      # bulk_disc_0 = create(:bulk_discount, percentage: 10, invoice: invoices[0])
+      binding.pry
+      expect(invoices[0].discount_amount).to eq()
+    end
   end
 end

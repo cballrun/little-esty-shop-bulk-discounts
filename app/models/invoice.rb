@@ -39,6 +39,10 @@ class Invoice < ApplicationRecord
     .sum("invoice_items.unit_price * invoice_items.quantity")
   end
 
+  def discount_amount
+
+  end
+
   def total_invoice_revenue_dollars 
     total_invoice_revenue.to_f / 100
   end
