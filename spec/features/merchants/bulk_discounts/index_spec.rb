@@ -48,8 +48,10 @@ RSpec.describe 'the Merchant Bulk Discounts Index' do
 
     it 'clicking the link deletes a bulk discount' do
       within("#discount_#{@bulk_discounts_0[0].id}") do
+        expect(@merchants[0].bulk_discounts.count).to eq(3)
         click_link "Delete This Bulk Discount"
-
+        expect(@merchants[0].bulk_discounts.count).to eq(2)
+        expect(current_path).to eq(merchant_bulk_discounts_path(@merchants[0]))
       end
     end
 
