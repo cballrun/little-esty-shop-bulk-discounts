@@ -15,4 +15,17 @@ class InvoiceItem < ApplicationRecord
   def self.unshipped_invoice_items
     where.not(status: 2)
   end
+
+  def inv_item_revenue
+    self.quantity * self.unit_price
+  end
+
+
+
+  def discount_amount
+    x = self.bulk_discounts
+    y = (x.percentage/100.to_f)
+    z = self.inv_item_revenue * y
+    z
+  end
 end

@@ -48,4 +48,18 @@ RSpec.describe InvoiceItem, type: :model do
       end
     end
   end
+
+  describe 'instance methods' do
+    describe '#discount_amount' do
+      it 'calculates the discount amount' do
+        merchant = create(:merchant)
+        bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
+        item = create(:item, merchant: merchant, unit_price: 500)
+        invoice = create(:invoice)
+        inv_item = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 3, unit_price: item.unit_price)
+        
+        expect(inv_item[0].discount_amount).to eq(150)
+      end
+    end
+  end
 end

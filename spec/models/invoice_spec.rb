@@ -183,8 +183,8 @@ RSpec.describe Invoice, type: :model do
       bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
       item = create(:item, merchant: merchant, unit_price: 500)
       invoice = create(:invoice)
-      inv_item = create(:invoice_item, item: item, invoice: invoice, quantity: 3, unit_price: item.unit_price)
-      binding.pry
+      inv_item = create_list(:invoice_item, item: item, invoice: invoice, quantity: 3, unit_price: item.unit_price)
+      
       
 
       expect(invoice.discount_amount).to eq(150)
