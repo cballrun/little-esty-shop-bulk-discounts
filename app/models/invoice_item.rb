@@ -26,7 +26,7 @@ class InvoiceItem < ApplicationRecord
   end
 
   def eligible_for_discount?
-    self.quantity >= self.bulk_discounts.quantity
+    quantity >= bulk_discounts.quantity
   end
 
   # def discount_amount
