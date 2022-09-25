@@ -10,7 +10,7 @@ class InvoiceItem < ApplicationRecord
   belongs_to :item
   belongs_to :invoice
   has_one :merchant, through: :item
-  has_many :bulk_discounts, through: :merchant
+  has_one :bulk_discounts, through: :merchant
 
   def self.unshipped_invoice_items
     where.not(status: 2)
@@ -23,6 +23,10 @@ class InvoiceItem < ApplicationRecord
   def self.eligible_for_discount
     joins(:bulk_discounts)
     .where("invoice_items.quantity >= bulk_discounts.quantity")
+  end
+
+  def eligible_for_discount?
+    self.quantity >= self.bulk_discounts.quantity
   end
 
   # def discount_amount
