@@ -87,6 +87,25 @@ RSpec.describe 'Invoice Show Page' do
     end
   end
 
+  describe 'discounted_revenue' do
+    before :each do
+      @merchant = create(:merchant)
+      @bulk_discount = create(:bulk_discount, merchant: @merchant, percentage: 10, quantity: 2)
+      @items = create_list(:item, 2, merchant: @merchant, unit_price: 500)
+      @invoice = create(:invoice)
+      @inv_items_eligible = create_list(:invoice_item, 3, item: @items[0], invoice: @invoice, quantity: 3, unit_price: @items[0].unit_price)
+      @inv_items_ineligible = create_list(:invoice_item, 3, item: @items[1], invoice: @invoice, quantity: 1, unit_price: @items[1].unit_price)
+      
+      visit merchant_invoice_path(@merchant, @invoice)
+    end
+
+    it 'shows the discounted revenue earned from the invoice' do
+
+      expect(page).to have_content("Discounted Revenue: $175.50")
+    end
+  end
+
+
   describe 'update item status' do
 
     before :each do

@@ -27,3 +27,4 @@
 <br>
 <br>
 Total Revenue: $<%= number_with_precision ((@invoice.total_revenue.to_f) / 100), precision: 2, delimiter: "," %>
+Discounted Revenue: $<%= number_with_precision ((@invoice.discounted_revenue.to_f) / 100), precision: 2, delimiter: "," %>
