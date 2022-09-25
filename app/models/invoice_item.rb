@@ -10,7 +10,7 @@ class InvoiceItem < ApplicationRecord
   belongs_to :item
   belongs_to :invoice
   has_one :merchant, through: :item
-  has_one:bulk_discounts, through: :merchant
+  has_many :bulk_discounts, through: :merchant
 
   def self.unshipped_invoice_items
     where.not(status: 2)
@@ -25,10 +25,10 @@ class InvoiceItem < ApplicationRecord
     .where("invoice_items.quantity >= bulk_discounts.quantity")
   end
 
-  def discount_amount
-    x = self.bulk_discounts
-    y = (x.percentage/100.to_f)
-    z = self.inv_item_revenue * y
-    z
-  end
+  # def discount_amount
+  #   x = self.bulk_discounts
+  #   y = (x.percentage/100.to_f)
+  #   z = self.inv_item_revenue * y
+  #   z
+  # end
 end

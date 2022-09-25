@@ -44,10 +44,12 @@ class Invoice < ApplicationRecord
   end
 
   def discount_amount
-    discounted_inv_items
+     invoice_items
     .joins(:bulk_discounts)
-    .select("(bulk_discount.percentage / 100.00) AS percentage", "sum(invoice_items.quantity *invoice_items.unit_price) as revenue")
-    .sum("percentage * revenue")
+    .where("invoice_items.quantity >= bulk_discounts.quantity")
+    .select("invoice_items.*, sum(invoice_items.quantity *invoice_items.unit_price * (bulk_discounts.percentage/100.00)) as discount_amount")
+    .group(:id)
+    .sum(&:discount_amount)
   end
 
   def total_invoice_revenue_dollars 
