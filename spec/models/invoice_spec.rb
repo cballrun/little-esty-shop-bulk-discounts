@@ -203,5 +203,18 @@ RSpec.describe Invoice, type: :model do
       
       expect(invoice.discount_amount).to eq(450)
     end
+
+    it 'can tell what its discounted revenue is' do
+      merchant = create(:merchant)
+      bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
+      item = create(:item, merchant: merchant, unit_price: 500)
+      invoice = create(:invoice)
+      inv_items_eligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 3, unit_price: item.unit_price)
+      inv_items_ineligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 1, unit_price: item.unit_price)
+      
+      expect(invoice.discounted_revenue).to eq(35550)
+    end
+
+
   end
 end
