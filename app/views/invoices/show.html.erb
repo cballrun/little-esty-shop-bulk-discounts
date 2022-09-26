@@ -10,14 +10,14 @@
 <br>
 
 <div class="items">
-  <% @invoice.items.each do |item| %>
-    <div id="item-<%=item.id%>">
-      Item Name: <%= item.name %> <br>
-      Item Quantity: <%= @invoice.find_invoice_item_quantity(@invoice, item) %> <br>
-      Item Price: $<%= number_with_precision ((item.unit_price.to_f) / 100), precision: 2, delimiter: "," %> <br>
-      Invoice Status: <%= @invoice.find_invoice_item_status(@invoice, item) %> 
-      <div id="status-update-<%=item.id%>">
-        <%= render partial: 'update_item_status', locals: { path: merchant_invoice_item_path(item.merchant, invoice_id: @invoice, item_id: item.id), method: :patch, options_array: ["Pending", "Packaged", "Shipped"], button_text: 'Submit' } %>
+  <% @merchant.invoice_items.each do |inv_item| %>
+    <div id="item-<%=inv_item.item.id%>">
+      Item Name: <%= inv_item.item.name %> <br>
+      Item Quantity: <%= inv_item.quantity %> <br>
+      Item Price: $<%= number_with_precision ((inv_item.item.unit_price.to_f) / 100), precision: 2, delimiter: "," %> <br>
+      Invoice Status: <%= inv_item.status %> 
+      <div id="status-update-<%=inv_item.item.id%>">
+        <%= render partial: 'update_item_status', locals: { path: merchant_invoice_item_path(inv_item.item.merchant, invoice_id: @invoice, item_id: inv_item.item.id), method: :patch, options_array: ["Pending", "Packaged", "Shipped"], button_text: 'Submit' } %>
       </div>
 <%# 
       <% item.invoice_items.each do |ii| %>
@@ -27,7 +27,6 @@
       <%# <% end %> %>
       <br>
       <br>
-      Total Merchant Revenue: $<%= number_with_precision ((@invoice.total_invoice_revenue_for_merchant(item.merchant_id).to_f) / 100), precision: 2, delimiter: "," %>
 
   <% end %>
 </div>
@@ -35,5 +34,5 @@
 <br>
 <br>
 Total Revenue: $<%= number_with_precision ((@invoice.total_revenue.to_f) / 100), precision: 2, delimiter: "," %>
-<%# Total Merchant Revenue: $<%= number_with_precision ((@invoice.total_invoice_revenue_for_merchant(@invoice).to_f) / 100), precision: 2, delimiter: "," %> %>
+Total Merchant Revenue: $<%= number_with_precision ((@invoice.total_invoice_revenue_for_merchant(@invoice).to_f) / 100), precision: 2, delimiter: "," %>
 Discounted Revenue: $<%= number_with_precision ((@invoice.discounted_revenue.to_f) / 100), precision: 2, delimiter: "," %>
