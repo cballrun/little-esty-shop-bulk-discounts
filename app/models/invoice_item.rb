@@ -25,6 +25,17 @@ class InvoiceItem < ApplicationRecord
     .where("invoice_items.quantity >= bulk_discounts.quantity")
   end
 
+  def invoice_item_best_discount
+    best = InvoiceItem
+    .joins(:bulk_discounts)
+    .select("invoice_items.*, bulk_discounts.*")
+    .where("invoice_items.quantity >= bulk_discounts.quantity AND invoice_items.id = ?", self.id)
+    .order("bulk_discounts.percentage desc")
+    .first
+    best.id
+  end
+
+
   def eligible_for_discount? ###needs to be fixed
     quantity >= bulk_discounts.quantity
   end
