@@ -195,14 +195,18 @@ RSpec.describe Invoice, type: :model do
 
         item_a1 = create(:item, merchant: merchants[0], unit_price: 5000)
         item_a2 = create(:item, merchant: merchants[0], unit_price: 700)
+        item_a3 = create(:item, merchant: merchants[0], unit_price: 1000)
+        item_a4 = create(:item, merchant: merchants[0], unit_price: 1000)
         item_b = create(:item, merchant: merchants[1], unit_price: 1500)
 
         inv_item_a1 = create(:invoice_item, quantity: 12, unit_price: item_a1.unit_price, invoice: invoice, merchant: merchants[0])
         inv_item_a2 = create(:invoice_item, quantity: 15, unit_price: item_a2.unit_price, invoice: invoice, merchant: merchants[0])
+        inv_item_a3 = create(:invoice_item, quantity: 9, unit_price: item_a3.unit_price, invoice: invoice, merchant: merchants[0])
+        inv_item_a4 = create(:invoice_item, quantity: 10, unit_price: item_a4.unit_price, invoice: invoice, merchant: merchants[0])
         inv_item_b = create(:invoice_item, quantity: 15, unit_price: item_b.unit_price, invoice: invoice, merchant: merchants[1])
 
-        binding.pry
-        expect(invoice.total_best_discount_amount_for_merchant(merchants[0].id)).to eq(15150)
+    
+        expect(invoice.total_best_discount_amount_for_merchant(merchants[0].id)).to eq(17150)
         expect(invoice.total_best_discount_amount_for_merchant(merchants[1].id)).to eq(0)
       end
     end

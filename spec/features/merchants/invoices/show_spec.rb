@@ -88,6 +88,27 @@ RSpec.describe 'Invoice Show Page' do
     end
   end
 
+  describe 'total merchant revenue' do
+
+    it 'shows the total revenue for only this merchant for this invoice' do
+      merchants = create_list(:merchant, 2)
+      invoice = create(:invoice)
+
+      item_0a = create(:item, merchant: merchants[0], unit_price: 1000)
+      item_0b = create(:item, merchant: merchants[0], unit_price: 2000)
+      item_1 = create(:item, merchant: merchants[1], unit_price: 500)
+
+      inv_item_0a = create(:invoice_item, quantity: 1, unit_price: item_0a.unit_price, invoice: invoice, merchant: merchants[0])
+      inv_item_0b = create(:invoice_item, quantity: 3, unit_price: item_0b.unit_price, invoice: invoice, merchant: merchants[0])
+      inv_item_1 = create(:invoice_item, quantity: 3, unit_price: item_1.unit_price, invoice: invoice, merchant: merchants[1])
+
+      visit merchant_invoice_path(merchants[0], invoice)
+      
+      expect(invoice.total_revenue).to eq(8500)
+      expect(page).to have_content("Total Merchant Revenue: $70.00")
+    end
+  end
+
   describe 'discounted_revenue' do
     before :each do
       @merchant = create(:merchant)
