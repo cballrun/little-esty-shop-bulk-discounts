@@ -13,6 +13,8 @@ RSpec.describe Invoice, type: :model do
     it { should have_many :invoice_items }
     it { should have_many(:items).through(:invoice_items) }
     it { should have_many :transactions }
+    it { should have_many(:merchants).through(:items)}
+    it { should have_many(:bulk_discounts).through(:merchants)}
   end
     
   describe 'factorybot' do
@@ -175,5 +177,44 @@ RSpec.describe Invoice, type: :model do
       expect(invoices[1].total_invoice_revenue_dollars).to eq(120.00)
       expect(invoices[2].total_invoice_revenue_dollars).to eq(270.00)
     end
+
+    it 'can tell which of its invoice items are eligible for a discount' do
+      merchant = create(:merchant)
+      bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
+      item = create(:item, merchant: merchant, unit_price: 500)
+      invoice = create(:invoice)
+      inv_items_eligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 2, unit_price: item.unit_price)
+      inv_items_ineligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 1, unit_price: item.unit_price)
+      
+      expect(invoice.discounted_inv_items).to include(inv_items_eligible[0])
+      expect(invoice.discounted_inv_items).to include(inv_items_eligible[1])
+      expect(invoice.discounted_inv_items).to include(inv_items_eligible[2])
+      expect(invoice.discounted_inv_items).to_not include(inv_items_ineligible[2])
+    end
+
+    it 'calculates the total invoice discount' do
+      merchant = create(:merchant)
+      bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
+      item = create(:item, merchant: merchant, unit_price: 500)
+      invoice = create(:invoice)
+      inv_items_eligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 3, unit_price: item.unit_price)
+      inv_items_ineligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 1, unit_price: item.unit_price)
+      
+      
+      expect(invoice.discount_amount).to eq(450)
+    end
+
+    it 'can tell what its discounted revenue is' do
+      merchant = create(:merchant)
+      bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
+      item = create(:item, merchant: merchant, unit_price: 500)
+      invoice = create(:invoice)
+      inv_items_eligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 3, unit_price: item.unit_price)
+      inv_items_ineligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 1, unit_price: item.unit_price)
+      
+      expect(invoice.discounted_revenue).to eq(35550)
+    end
+
+
   end
 end

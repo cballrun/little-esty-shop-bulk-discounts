@@ -15,6 +15,8 @@ RSpec.describe InvoiceItem, type: :model do
   describe 'relationships' do
     it { should belong_to :item}
     it { should belong_to :invoice}
+    it { should have_one(:merchant).through(:item)}
+    it { should have_one(:bulk_discounts).through(:merchant)}
   end
 
   it 'instantiates with factorybot' do
@@ -43,6 +45,48 @@ RSpec.describe InvoiceItem, type: :model do
           expect(ii.status).to_not eq("Shipped")
         end
         expect(InvoiceItem.unshipped_invoice_items.count).to eq(10)
+      end
+    end
+  end
+
+  describe 'instance methods' do
+    # describe '#discount_amount' do
+    #   it 'calculates the discount amount' do
+    #     merchant = create(:merchant)
+    #     bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
+    #     item = create(:item, merchant: merchant, unit_price: 500)
+    #     invoice = create(:invoice)
+    #     inv_item = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 3, unit_price: item.unit_price)
+        
+    #     expect(inv_item[0].discount_amount).to eq(150)
+    #   end
+    # end
+
+    describe '#eligible_for_discount?' do
+      it 'can tell if an invoice item is eligible for a discount' do
+        merchant = create(:merchant)
+        bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
+        item = create(:item, merchant: merchant, unit_price: 500)
+        invoice = create(:invoice)
+        inv_items_eligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 2, unit_price: item.unit_price)
+        inv_items_ineligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 1, unit_price: item.unit_price)
+
+        expect(InvoiceItem.eligible_for_discount).to eq(inv_items_eligible)
+      end
+
+      describe '#eligible_for_discount?' do
+        it 'can tell if an invoice item is eligible for a discount' do
+          merchant = create(:merchant)
+          bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
+          item = create(:item, merchant: merchant, unit_price: 500)
+          invoice = create(:invoice)
+          inv_items_eligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 2, unit_price: item.unit_price)
+          inv_items_ineligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 1, unit_price: item.unit_price)
+          
+        
+          expect(inv_items_eligible[0].eligible_for_discount?).to eq(true)
+          expect(inv_items_ineligible[0].eligible_for_discount?).to eq(false)
+        end
       end
     end
   end

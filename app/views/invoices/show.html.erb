@@ -19,6 +19,12 @@
       <div id="status-update-<%=item.id%>">
         <%= render partial: 'update_item_status', locals: { path: merchant_invoice_item_path(item.merchant, invoice_id: @invoice, item_id: item.id), method: :patch, options_array: ["Pending", "Packaged", "Shipped"], button_text: 'Submit' } %>
       </div>
+
+      <% item.invoice_items.each do |ii| %>
+        <% if ii.eligible_for_discount? %>
+            <p> <%= link_to "See Discount", merchant_bulk_discount_path(item.merchant, ii.bulk_discounts) %> </p>
+        <% end %>
+      <% end %>
       <br>
       <br>
   <% end %>
@@ -27,3 +33,4 @@
 <br>
 <br>
 Total Revenue: $<%= number_with_precision ((@invoice.total_revenue.to_f) / 100), precision: 2, delimiter: "," %>
+Discounted Revenue: $<%= number_with_precision ((@invoice.discounted_revenue.to_f) / 100), precision: 2, delimiter: "," %>

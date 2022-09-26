@@ -4,6 +4,8 @@ class Merchant < ApplicationRecord
   validates_presence_of :status, inclusion: ["Enabled", "Disabled"]
   has_many :items
   has_many :bulk_discounts
+  has_many :invoice_items, through: :items
+  has_many :invoices, through: :invoice_items
 
   def merchant_invoices
     Invoice.joins(:items).where("items.merchant_id = ?", id).distinct

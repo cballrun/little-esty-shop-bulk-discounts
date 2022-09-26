@@ -6,7 +6,7 @@ RSpec.describe 'Invoice Show Page' do
     before :each do
       @merchant = create(:merchant)
       @merchant2 = create(:merchant)
-      
+      @bulk_discount = create(:bulk_discount, merchant: @merchant, percentage: 10, quantity: 100000)
       @items = create_list(:item, 10, merchant: @merchant)
       @items2 = create_list(:item, 10, merchant: @merchant2)
   
@@ -67,6 +67,7 @@ RSpec.describe 'Invoice Show Page' do
   describe 'total_revenue' do
     before :each do
       @merchant = create(:merchant)
+      @bulk_discount = create(:bulk_discount, merchant: @merchant, percentage: 10, quantity: 100000)
 
       @customer = create(:customer)
       
@@ -87,10 +88,38 @@ RSpec.describe 'Invoice Show Page' do
     end
   end
 
+  describe 'discounted_revenue' do
+    before :each do
+      @merchant = create(:merchant)
+      @bulk_discount = create(:bulk_discount, merchant: @merchant, percentage: 10, quantity: 2)
+      @items = create_list(:item, 8, merchant: @merchant, unit_price: 500)
+      @invoice = create(:invoice)
+      @inv_item_eligible_0 = create(:invoice_item, item: @items[0], invoice: @invoice, quantity: 3, unit_price: @items[0].unit_price)
+      @inv_item_eligible_1 = create(:invoice_item, item: @items[1], invoice: @invoice, quantity: 2, unit_price: @items[0].unit_price)
+      @inv_items_ineligible = create_list(:invoice_item, 3, item: @items[7], invoice: @invoice, quantity: 1, unit_price: @items[1].unit_price)
+      
+      visit merchant_invoice_path(@merchant, @invoice)
+    end
+
+    it 'shows the discounted revenue earned from the invoice' do
+      
+      expect(page).to have_content("Discounted Revenue: $67.50")
+    end
+
+    it 'has a link to view a discount if invoice item is eligible for a discount' do
+
+      expect(page).to have_link("See Discount", count: 2)
+
+      #within block and click
+    end
+  end
+
+
   describe 'update item status' do
 
     before :each do
       @merchant = create(:merchant)
+      @bulk_discount = create(:bulk_discount, merchant: @merchant, percentage: 10, quantity: 100000)
 
       @customer = create(:customer)
       
