@@ -29,6 +29,10 @@ class InvoiceItem < ApplicationRecord
     quantity >= bulk_discounts.quantity
   end
 
+  def best_discount
+    bulk_discounts.max_by(percentage)
+  end
+
   # def discount_amount
   #   x = self.bulk_discounts
   #   y = (x.percentage/100.to_f)

@@ -198,6 +198,9 @@ RSpec.describe Invoice, type: :model do
         expect(invoice.discount_amount).to eq(450)
       end
 
+      
+
+
     end
 
     it 'can tell what its discounted revenue is' do

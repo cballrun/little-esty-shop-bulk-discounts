@@ -96,6 +96,25 @@ RSpec.describe InvoiceItem, type: :model do
         expect(InvoiceItem.invoice_items_eligible_for_discount).to eq([inv_item_a])
       end
 
+      describe "#best_discount" do
+        xit 'can tell what the best discount is' do
+          merchant = create(:merchant)
+          invoice = create(:invoice)
+          
+          bulk_discount_a = create(:bulk_discount, merchant: merchant, percentage: 20, quantity: 10)
+          bulk_discount_b = create(:bulk_discount, merchant: merchant, percentage: 30, quantity: 15)
+          
+          item_a = create(:item, merchant: merchant)
+          item_b = create(:item, merchant: merchant)
+         
+          inv_item_a = create(:invoice_item, quantity: 12, item: item_a, invoice: invoice)
+          inv_item_b = create(:invoice_item, quantity: 15, item: item_b, invoice: invoice)
+
+          expect(inv_item_a.best_discount).to eq(bulk_discount_a)
+        end
+      end
+
+
 
 
 
