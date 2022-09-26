@@ -22,7 +22,7 @@ class Invoice < ApplicationRecord
 
   def total_revenue
     items.
-    joins(:invoice_items).
+    joins(:invoice_items)
     sum('invoice_items.quantity * invoice_items.unit_price')
   end
 
@@ -33,7 +33,7 @@ class Invoice < ApplicationRecord
     .order(:created_at)
   end
 
-  def total_invoice_revenue
+  def total_invoice_revenue_for_merchant
     items
     .joins(:invoice_items)
     .sum("invoice_items.unit_price * invoice_items.quantity")
