@@ -181,8 +181,29 @@ RSpec.describe Invoice, type: :model do
 
         inv_item_a = create(:invoice_item, quantity: 12, unit_price: item_a.unit_price, invoice: invoice, merchant: merchant)
         inv_item_b = create(:invoice_item, quantity:15, unit_price: item_b.unit_price, invoice: invoice, merchant: merchant)
-        binding.pry
+        
         expect(invoice.total_best_discount_amount_for_merchant(merchant.id)).to eq(4650)
+      end
+
+      it 'calculates the total of the best discounts if there are multiple merchants on the invoice' do
+        merchants = create_list(:merchant, 2)
+        invoice = create(:invoice)
+
+        bulk_discount_a = create(:bulk_discount, percentage: 20, quantity: 10, merchant: merchants[0])
+        bulk_discount_b = create(:bulk_discount, percentage: 30, quantity: 15, merchant: merchants[0])
+        bulk_discount_c = create(:bulk_discount, percentage: 30, quantity: 17, merchant: merchants[1])
+
+        item_a1 = create(:item, merchant: merchants[0], unit_price: 5000)
+        item_a2 = create(:item, merchant: merchants[0], unit_price: 700)
+        item_b = create(:item, merchant: merchants[1], unit_price: 1500)
+
+        inv_item_a1 = create(:invoice_item, quantity: 12, unit_price: item_a1.unit_price, invoice: invoice, merchant: merchants[0])
+        inv_item_a2 = create(:invoice_item, quantity: 15, unit_price: item_a2.unit_price, invoice: invoice, merchant: merchants[0])
+        inv_item_b = create(:invoice_item, quantity: 15, unit_price: item_b.unit_price, invoice: invoice, merchant: merchants[1])
+
+        binding.pry
+        expect(invoice.total_best_discount_amount_for_merchant(merchants[0].id)).to eq(15150)
+        expect(invoice.total_best_discount_amount_for_merchant(merchants[1].id)).to eq(0)
       end
     end
 

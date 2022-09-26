@@ -44,10 +44,9 @@ class Invoice < ApplicationRecord
     invoice_items
     .joins(:bulk_discounts)
     .where("invoice_items.quantity >= bulk_discounts.quantity AND bulk_discounts.merchant_id = ?", merchant_id)
-    .select()
-    .distinct
-    .group
-    .sum
+    .select("invoice_items.*, max(invoice_items.quantity *invoice_items.unit_price * (bulk_discounts.percentage/100.00)) as discount_amount")
+    .group(:id)
+    .sum(&:discount_amount)
   end
 
 
