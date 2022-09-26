@@ -168,6 +168,24 @@ RSpec.describe Invoice, type: :model do
       end
     end
 
+    describe '#total_best_discount_amount_for_merchant' do
+      it 'calculates the total of the best discounts for one merchant' do
+        merchant = create(:merchant, id: 1)
+        invoice = create(:invoice)
+
+        bulk_discount_a = create(:bulk_discount, percentage: 20, quantity: 10, merchant: merchant)
+        bulk_discount_b = create(:bulk_discount, percentage: 30, quantity: 15, merchant: merchant)
+
+        item_a = create(:item, merchant: merchant, unit_price: 1000)
+        item_b = create(:item, merchant: merchant, unit_price: 500)
+
+        inv_item_a = create(:invoice_item, quantity: 12, unit_price: item_a.unit_price, invoice: invoice, merchant: merchant)
+        inv_item_b = create(:invoice_item, quantity:15, unit_price: item_b.unit_price, invoice: invoice, merchant: merchant)
+        binding.pry
+        expect(invoice.total_best_discount_amount_for_merchant(merchant.id)).to eq(4650)
+      end
+    end
+
     it 'calculates total invoice revenue in dollars' do
       invoices = create_list(:invoice, 3)
 

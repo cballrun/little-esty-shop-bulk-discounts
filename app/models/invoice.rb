@@ -40,6 +40,17 @@ class Invoice < ApplicationRecord
     .sum("invoice_items.unit_price * invoice_items.quantity")
   end
 
+  def total_best_discount_amount_for_merchant(merchant_id)
+    invoice_items
+    .joins(:bulk_discounts)
+    .where("invoice_items.quantity >= bulk_discounts.quantity AND bulk_discounts.merchant_id = ?", merchant_id)
+    .select()
+    .distinct
+    .group
+    .sum
+  end
+
+
   def discounted_inv_items ###needs to be fixed
    invoice_items.eligible_for_discount
   end
