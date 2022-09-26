@@ -154,7 +154,17 @@ RSpec.describe Invoice, type: :model do
   describe 'instance methods' do
     describe '#total_invoice_revenue_for_merchant' do
       it 'calculates the total invoice revenue for one merchant' do
-        
+        merchants = create_list(:merchant, 2)
+        invoice = create(:invoice)
+
+        item_0 = create(:item, merchant: merchants[0], unit_price: 200)
+        item_1 = create(:item, merchant: merchants[1], unit_price: 500)
+
+        inv_item_0 = create(:invoice_item, quantity: 1, unit_price: item_0.unit_price, invoice: invoice, merchant: merchants[0])
+        inv_item_1 = create(:invoice_item, quantity: 3, unit_price: item_1.unit_price, invoice: invoice, merchant: merchants[1])
+       
+        expect(invoice.total_invoice_revenue_for_merchant(merchants[0].id)).to eq(200)
+        expect(invoice.total_invoice_revenue_for_merchant(merchants[1].id)).to eq(1500)
       end
     end
 
@@ -172,7 +182,7 @@ RSpec.describe Invoice, type: :model do
   
 
     describe ("#discount_amount") do
-      it 'can tell which of its invoice items are eligible for a discount' do
+      xit 'can tell which of its invoice items are eligible for a discount' do
         merchant = create(:merchant)
         bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
         item = create(:item, merchant: merchant, unit_price: 500)
@@ -198,7 +208,7 @@ RSpec.describe Invoice, type: :model do
         expect(invoice.discount_amount).to eq(450)
       end
 
-      
+
 
 
     end

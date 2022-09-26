@@ -22,7 +22,7 @@ class Invoice < ApplicationRecord
 
   def total_revenue
     items.
-    joins(:invoice_items)
+    joins(:invoice_items).
     sum('invoice_items.quantity * invoice_items.unit_price')
   end
 
@@ -33,13 +33,14 @@ class Invoice < ApplicationRecord
     .order(:created_at)
   end
 
-  def total_invoice_revenue_for_merchant
+  def total_invoice_revenue_for_merchant(merchant_id)
     items
     .joins(:invoice_items)
+    .where("items.merchant_id = ?", merchant_id)
     .sum("invoice_items.unit_price * invoice_items.quantity")
   end
 
-  def discounted_inv_items
+  def discounted_inv_items ###needs to be fixed
    invoice_items.eligible_for_discount
   end
 
@@ -57,6 +58,6 @@ class Invoice < ApplicationRecord
   end
 
   def total_invoice_revenue_dollars 
-    total_invoice_revenue.to_f / 100
+    total_revenue.to_f / 100
   end
 end
