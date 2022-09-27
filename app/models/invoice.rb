@@ -49,6 +49,10 @@ class Invoice < ApplicationRecord
     .sum(&:discount_amount)
   end
 
+  def total_discounted_revenue_for_merchant(merchant_id)
+    total_invoice_revenue_for_merchant(merchant_id) - total_best_discount_amount_for_merchant(merchant_id)
+  end
+
 
   def discounted_inv_items ###needs to be fixed
    invoice_items.eligible_for_discount

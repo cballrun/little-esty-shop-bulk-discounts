@@ -90,7 +90,7 @@ RSpec.describe 'Invoice Show Page' do
 
   describe 'total merchant revenue' do
 
-    xit 'shows the total revenue for only this merchant for this invoice' do
+    it 'shows the total revenue for only this merchant for this invoice' do
       merchants = create_list(:merchant, 2)
       invoice = create(:invoice)
 
@@ -103,7 +103,6 @@ RSpec.describe 'Invoice Show Page' do
       inv_item_1 = create(:invoice_item, quantity: 3, unit_price: item_1.unit_price, invoice: invoice, merchant: merchants[1])
 
       visit merchant_invoice_path(merchants[0], invoice)
-      save_and_open_page
       expect(invoice.total_revenue).to eq(8500)
       expect(page).to have_content("Total Merchant Revenue: $70.00")
     end
