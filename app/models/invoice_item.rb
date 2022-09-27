@@ -32,13 +32,22 @@ class InvoiceItem < ApplicationRecord
     .where("invoice_items.quantity >= bulk_discounts.quantity AND invoice_items.id = ?", self.id)
     .order("bulk_discounts.percentage desc")
     .first
-    best.id
+   
+    if !best.nil?
+      best.id
+    else
+      nil
+    end
+  end
+
+  def eligible_for_discount?
+    !invoice_item_best_discount.nil?
   end
 
 
-  def eligible_for_discount? ###needs to be fixed
-    quantity >= bulk_discounts.quantity
-  end
+  # def eligible_for_discount? ###needs to be fixed
+  #   quantity >= bulk_discounts.quantity
+  # end
 
   def best_discount
     bulk_discounts.max_by(percentage)

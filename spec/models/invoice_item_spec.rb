@@ -122,12 +122,15 @@ RSpec.describe InvoiceItem, type: :model do
           
           item_a = create(:item, merchant: merchant)
           item_b = create(:item, merchant: merchant)
+          item_c = create(:item, merchant: merchant)
          
           inv_item_a = create(:invoice_item, quantity: 12, item: item_a, invoice: invoice)
           inv_item_b = create(:invoice_item, quantity: 15, item: item_b, invoice: invoice)
+          inv_item_c = create(:invoice_item, quantity: 2, item: item_c, invoice: invoice)
 
           expect(inv_item_a.invoice_item_best_discount).to eq(bulk_discount_a.id)
           expect(inv_item_b.invoice_item_best_discount).to eq(bulk_discount_b.id)
+          expect(inv_item_c.invoice_item_best_discount).to eq(nil)
         end
       end
 
@@ -137,7 +140,7 @@ RSpec.describe InvoiceItem, type: :model do
 
 
       describe '#eligible_for_discount?' do ###needs a refactor
-        xit 'can tell if an invoice item is eligible for a discount' do
+        it 'can tell if an invoice item is eligible for a discount' do
           merchant = create(:merchant)
           bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
           item = create(:item, merchant: merchant, unit_price: 500)
