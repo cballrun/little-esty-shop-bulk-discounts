@@ -238,18 +238,6 @@ RSpec.describe Invoice, type: :model do
     end
 
     
-
-    it 'calculates total invoice revenue in dollars' do
-      invoices = create_list(:invoice, 3)
-
-      inv_items_0 = create_list(:invoice_item, 3, invoice: invoices[0], unit_price: 1000, quantity: 1)
-      inv_items_1 = create_list(:invoice_item, 3, invoice: invoices[1], unit_price: 2000, quantity: 2)
-      inv_items_2 = create_list(:invoice_item, 3, invoice: invoices[2], unit_price: 3000, quantity: 3)
-      
-      expect(invoices[0].total_invoice_revenue_dollars).to eq(30.00)
-      expect(invoices[1].total_invoice_revenue_dollars).to eq(120.00)
-      expect(invoices[2].total_invoice_revenue_dollars).to eq(270.00)
-    end
     
   describe '#discounted_revenue' do
     it 'can tell what its discounted revenue is' do

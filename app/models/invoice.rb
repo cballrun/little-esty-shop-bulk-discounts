@@ -66,8 +66,4 @@ class Invoice < ApplicationRecord
   def discounted_revenue
     total_revenue - discount_amount
   end
-
-  def total_invoice_revenue_dollars 
-    total_revenue.to_f / 100
-  end
 end

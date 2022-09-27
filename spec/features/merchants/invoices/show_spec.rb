@@ -64,29 +64,7 @@ RSpec.describe 'Invoice Show Page' do
     end
   end
 
-  describe 'total_revenue' do
-    before :each do
-      @merchant = create(:merchant)
-      @bulk_discount = create(:bulk_discount, merchant: @merchant, percentage: 10, quantity: 100000)
 
-      @customer = create(:customer)
-      
-      @item = create(:item, merchant: @merchant, unit_price: 100)
-      @item_2 = create(:item, merchant: @merchant, unit_price: 100)
-
-      @invoice = create(:invoice, customer: @customer, status: 1)
-
-      @invoice_items = create(:invoice_item, item: @item, invoice: @invoice, unit_price: @item.unit_price, quantity: 1)
-      @invoice_items = create(:invoice_item, item: @item_2, invoice: @invoice, unit_price: @item_2.unit_price, quantity: 1)
-    end
-
-    it 'shows the total revenue earned from the invoice' do
-      visit merchant_invoice_path(@merchant, @invoice)
-
-      expect(page).to have_content("Total Revenue:")
-      expect(page).to have_content("$2.00")
-    end
-  end
 
   describe 'merchant invoice revenue' do
 
@@ -146,10 +124,6 @@ RSpec.describe 'Invoice Show Page' do
       visit merchant_invoice_path(@merchant, @invoice)
     end
 
-    it 'shows the discounted revenue earned from the invoice' do
-      
-      expect(page).to have_content("Discounted Revenue: $67.50")
-    end
 
     it 'has a link to view a discount if invoice item is eligible for a discount' do
       
