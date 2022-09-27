@@ -32,7 +32,7 @@ class InvoiceItem < ApplicationRecord
     .where("invoice_items.quantity >= bulk_discounts.quantity AND invoice_items.id = ?", self.id)
     .order("bulk_discounts.percentage desc")
     .first
-   
+
     if !best.nil?
       best.id
     else

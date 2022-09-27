@@ -135,7 +135,8 @@ RSpec.describe 'Invoice Show Page' do
   describe 'discounted_revenue' do
     before :each do
       @merchant = create(:merchant)
-      @bulk_discount = create(:bulk_discount, merchant: @merchant, percentage: 10, quantity: 2)
+      @bulk_discount_1 = create(:bulk_discount, merchant: @merchant, percentage: 10, quantity: 2)
+      @bulk_discount_2 = create(:bulk_discount, merchant: @merchant, percentage: 5, quantity: 2)
       @items = create_list(:item, 8, merchant: @merchant, unit_price: 500)
       @invoice = create(:invoice)
       @inv_item_eligible_0 = create(:invoice_item, item: @items[0], invoice: @invoice, quantity: 3, unit_price: @items[0].unit_price)
@@ -151,10 +152,12 @@ RSpec.describe 'Invoice Show Page' do
     end
 
     it 'has a link to view a discount if invoice item is eligible for a discount' do
-      save_and_open_page
+      
       expect(page).to have_link("View Applied Discount", count: 2)
-
-      #within block and click
+      within("#discount-link-#{@inv_item_eligible_0.id}") do
+        click_link "View Applied Discount"
+        expect(current_path).to eq(merchant_bulk_discount_path(@merchant, @bulk_discount_1))
+      end
     end
   end
 

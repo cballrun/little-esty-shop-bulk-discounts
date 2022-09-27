@@ -19,10 +19,11 @@
       <div id="status-update-<%=inv_item.item.id%>">
         <%= render partial: 'update_item_status', locals: { path: merchant_invoice_item_path(@merchant, invoice_id: @invoice, item_id: inv_item.item.id), method: :patch, options_array: ["Pending", "Packaged", "Shipped"], button_text: 'Submit' } %>
       </div>
-
+    <div id="discount-link-<%=inv_item.id%>">
     <% if inv_item.eligible_for_discount? %>
       <%= link_to "View Applied Discount", merchant_bulk_discount_path(@merchant, inv_item.invoice_item_best_discount) %>
     <%end%>
+    </div>
 
       <br>
       <br>
