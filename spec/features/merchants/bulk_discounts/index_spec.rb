@@ -54,11 +54,26 @@ RSpec.describe 'the Merchant Bulk Discounts Index' do
         expect(current_path).to eq(merchant_bulk_discounts_path(@merchants[0]))
       end
     end
-
-
   end
 
+  describe 'upcoming holidays section' do
+    it 'shows the names of the next 3 upcoming holidays' do
+      within("#upcoming_holidays") do
+        expect(page).to have_content("Name", count: 3)
+      end
+    end
 
-  
+    it 'shows the date of the next 3 upcoming holidays' do
+      within("#upcoming_holidays") do
+        expect(page).to have_content("Date", count: 3)
+      end
+    end
 
+    it 'shows the next 3 holidays in calendar order' do
+      within("#upcoming_holidays") do
+        expect("Columbus Day").to appear_before("Veterans Day")
+        expect("Thanksgiving Day").to_not appear_before("Veterans Day")
+      end
+    end
+  end
 end
