@@ -1,3 +1,13 @@
+<section id= "upcoming_holidays">
+<h3>Next 3 Upcoming Holidays  </h3>
+<% @holiday_info.each do |holiday|%>
+  <div id = "holiday_<%=holiday.name%>">
+  Name: <%= holiday.name %> Date: <%= holiday.date %> </p>
+  </div>
+<%end%>
+
+</section>
+
 <h1> <%= @merchant.name %>'s Bulk Discounts </h1>
 
 <%= link_to "Create Bulk Discount", new_merchant_bulk_discount_path(@merchant)  %>

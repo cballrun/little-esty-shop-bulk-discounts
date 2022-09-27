@@ -1,8 +1,11 @@
 class HolidayFacade
 
   def self.get_holiday_data
-    holiday_data = Hash.new
-
+    parsed = HolidayService.get_data
+    holidays = parsed.map do |holiday_data|
+      Holiday.new(holiday_data)
+    end
+    holidays[0..2]
   end
 
   def self.get_holiday_name_data

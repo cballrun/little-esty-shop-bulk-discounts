@@ -14,4 +14,12 @@ RSpec.describe HolidayFacade do
       expect(HolidayFacade.get_holiday_date_data).to eq(["2022-10-10", "2022-11-11", "2022-11-24"])
     end
   end
+
+  it 'gets holiday data with a poro' do
+    VCR.use_cassette("next_holiday_data", :allow_playback_repeats => true) do
+      expect(HolidayFacade.get_holiday_data).to be_a(Array)
+      expect(HolidayFacade.get_holiday_data.count).to eq(3)
+    end
+  end
+
 end

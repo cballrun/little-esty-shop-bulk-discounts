@@ -5,6 +5,10 @@ class ApplicationController < ActionController::Base
   #   @github_info = GithubFacade.get_github_data
   # end
 
+  # def get_holiday_info
+  #   @holiday_info = HolidayFacade.get_holiday_data
+  # end
+
   private
 
   def error_message(errors)
