@@ -16,10 +16,6 @@ class InvoiceItem < ApplicationRecord
     where.not(status: 2)
   end
 
-  def inv_item_revenue
-    self.quantity * self.unit_price
-  end
-
   def self.invoice_items_eligible_for_discount
     joins(:bulk_discounts)
     .where("invoice_items.quantity >= bulk_discounts.quantity")
