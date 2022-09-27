@@ -2,14 +2,20 @@ require 'rails_helper'
 
 RSpec.describe 'The Admin Invoice Show' do
   before :each do
+    @merchant = create(:merchant)
+    @discount = create(:bulk_discount, percentage: 10, quantity: 2, merchant: @merchant)
     @invoices = create_list(:invoice, 20)
 
     @inv_items_0 = create_list(:invoice_item, 5, invoice: @invoices[0])
     @inv_items_1 = create_list(:invoice_item, 5, invoice: @invoices[1])
     @inv_items_2 = create_list(:invoice_item, 5, invoice: @invoices[2])
     visit admin_invoice_path(@invoices[0])
+    
     @inv_extra = create(:invoice)
-    @inv_extra_inv_items = create_list(:invoice_item, 3, unit_price: 500, invoice: @inv_extra, quantity: 2)
+    
+    @inv_extra_inv_item_1 = create(:invoice_item, unit_price: 500, invoice: @inv_extra, quantity: 3, merchant: @merchant)
+    @inv_extra_inv_item_2 = create(:invoice_item, unit_price: 1000, invoice: @inv_extra, quantity: 2, merchant: @merchant)
+    @inv_extra_inv_item_3 = create(:invoice_item, unit_price: 2000, invoice: @inv_extra, quantity: 1, merchant: @merchant)
   end
   
   describe 'invoice info section' do
@@ -49,14 +55,24 @@ RSpec.describe 'The Admin Invoice Show' do
         end
       end
     end
+  
 
     it 'shows the total revenue in dollars' do
       visit admin_invoice_path(@inv_extra)
       within("#invoice_info") do
-        expect(page).to have_content("Total Revenue: $30.00")
+        expect(page).to have_content("Total Revenue: $55.00")
+      end
+    end
+
+
+    it 'shows the discounted in dollars' do
+      visit admin_invoice_path(@inv_extra)
+      within("#invoice_info") do
+        expect(page).to have_content("Discounted Revenue: $51.50")
       end
     end
   end
+
 
   describe 'invoice item information section' do
     it 'shows all item names' do
