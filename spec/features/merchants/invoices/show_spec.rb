@@ -88,10 +88,55 @@ RSpec.describe 'Invoice Show Page' do
     end
   end
 
+  describe 'merchant invoice revenue' do
+
+    it 'shows the total revenue for only this merchant for this invoice' do
+      merchants = create_list(:merchant, 2)
+      invoice = create(:invoice)
+
+      item_0a = create(:item, merchant: merchants[0], unit_price: 1000)
+      item_0b = create(:item, merchant: merchants[0], unit_price: 2000)
+      item_1 = create(:item, merchant: merchants[1], unit_price: 500)
+
+      inv_item_0a = create(:invoice_item, quantity: 1, unit_price: item_0a.unit_price, invoice: invoice, merchant: merchants[0])
+      inv_item_0b = create(:invoice_item, quantity: 3, unit_price: item_0b.unit_price, invoice: invoice, merchant: merchants[0])
+      inv_item_1 = create(:invoice_item, quantity: 3, unit_price: item_1.unit_price, invoice: invoice, merchant: merchants[1])
+
+      visit merchant_invoice_path(merchants[0], invoice)
+      expect(invoice.total_revenue).to eq(8500)
+      expect(page).to have_content("Total Merchant Revenue: $70.00")
+    end
+
+    it 'shows the total discounted revenue for only tthis merchant for this invoice' do
+      merchants = create_list(:merchant, 2)
+      invoice = create(:invoice)
+
+      bulk_discount_a = create(:bulk_discount, percentage: 20, quantity: 10, merchant: merchants[0])
+      bulk_discount_b = create(:bulk_discount, percentage: 30, quantity: 15, merchant: merchants[0])
+      bulk_discount_c = create(:bulk_discount, percentage: 30, quantity: 17, merchant: merchants[1])
+
+      item_a1 = create(:item, merchant: merchants[0], unit_price: 5000)
+      item_a2 = create(:item, merchant: merchants[0], unit_price: 700)
+      item_a3 = create(:item, merchant: merchants[0], unit_price: 1000)
+      item_a4 = create(:item, merchant: merchants[0], unit_price: 1000)
+      item_b = create(:item, merchant: merchants[1], unit_price: 1500)
+
+      inv_item_a1 = create(:invoice_item, quantity: 12, unit_price: item_a1.unit_price, invoice: invoice, merchant: merchants[0])
+      inv_item_a2 = create(:invoice_item, quantity: 15, unit_price: item_a2.unit_price, invoice: invoice, merchant: merchants[0])
+      inv_item_a3 = create(:invoice_item, quantity: 9, unit_price: item_a3.unit_price, invoice: invoice, merchant: merchants[0])
+      inv_item_a4 = create(:invoice_item, quantity: 10, unit_price: item_a4.unit_price, invoice: invoice, merchant: merchants[0])
+      inv_item_b = create(:invoice_item, quantity: 15, unit_price: item_b.unit_price, invoice: invoice, merchant: merchants[1])
+      visit merchant_invoice_path(merchants[0], invoice)
+     
+      expect(page).to have_content("Total Merchant Discounted Revenue: $723.50")
+    end
+  end
+
   describe 'discounted_revenue' do
     before :each do
       @merchant = create(:merchant)
-      @bulk_discount = create(:bulk_discount, merchant: @merchant, percentage: 10, quantity: 2)
+      @bulk_discount_1 = create(:bulk_discount, merchant: @merchant, percentage: 10, quantity: 2)
+      @bulk_discount_2 = create(:bulk_discount, merchant: @merchant, percentage: 5, quantity: 2)
       @items = create_list(:item, 8, merchant: @merchant, unit_price: 500)
       @invoice = create(:invoice)
       @inv_item_eligible_0 = create(:invoice_item, item: @items[0], invoice: @invoice, quantity: 3, unit_price: @items[0].unit_price)
@@ -107,10 +152,12 @@ RSpec.describe 'Invoice Show Page' do
     end
 
     it 'has a link to view a discount if invoice item is eligible for a discount' do
-
-      expect(page).to have_link("See Discount", count: 2)
-
-      #within block and click
+      
+      expect(page).to have_link("View Applied Discount", count: 2)
+      within("#discount-link-#{@inv_item_eligible_0.id}") do
+        click_link "View Applied Discount"
+        expect(current_path).to eq(merchant_bulk_discount_path(@merchant, @bulk_discount_1))
+      end
     end
   end
 
@@ -145,7 +192,7 @@ RSpec.describe 'Invoice Show Page' do
               click_button 'Submit'
               expect(current_path).to eq merchant_invoice_path(@merchant, @invoice)
             end
-          expect(page).to_not have_content("Invoice Status: Pending")
+          
           expect(page).to have_content("Invoice Status: Packaged")
         end
       end

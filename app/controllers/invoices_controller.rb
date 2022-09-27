@@ -7,7 +7,8 @@ class InvoicesController < ApplicationController
 
   def show
     @invoice = Invoice.find(params[:id])
-    @eligible_items = @invoice.invoice_items.eligible_for_discount
+    @merchant = Merchant.find(params[:merchant_id])
+    # @eligible_items = @invoice.invoice_items.eligible_for_discount
   end
 
 end

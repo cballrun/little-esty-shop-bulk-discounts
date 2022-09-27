@@ -152,17 +152,88 @@ RSpec.describe Invoice, type: :model do
 
 
   describe 'instance methods' do
-    describe '#total_invoice_revenue' do
-      it 'calculates the total invoice revenue' do
-        invoices = create_list(:invoice, 3)
+    describe '#total_invoice_revenue_for_merchant' do
+      it 'calculates the total invoice revenue for one merchant' do
+        merchants = create_list(:merchant, 2)
+        invoice = create(:invoice)
 
-        inv_items_0 = create_list(:invoice_item, 3, invoice: invoices[0], unit_price: 1000, quantity: 1)
-        inv_items_1 = create_list(:invoice_item, 3, invoice: invoices[1], unit_price: 2000, quantity: 2)
-        inv_items_2 = create_list(:invoice_item, 3, invoice: invoices[2], unit_price: 3000, quantity: 3)
+        item_0 = create(:item, merchant: merchants[0], unit_price: 200)
+        item_1 = create(:item, merchant: merchants[1], unit_price: 500)
+
+        inv_item_0 = create(:invoice_item, quantity: 1, unit_price: item_0.unit_price, invoice: invoice, merchant: merchants[0])
+        inv_item_1 = create(:invoice_item, quantity: 3, unit_price: item_1.unit_price, invoice: invoice, merchant: merchants[1])
+       
+        expect(invoice.total_invoice_revenue_for_merchant(merchants[0].id)).to eq(200)
+        expect(invoice.total_invoice_revenue_for_merchant(merchants[1].id)).to eq(1500)
+      end
+    end
+
+    describe '#total_best_discount_amount_for_merchant' do
+      it 'calculates the total of the best discounts for one merchant' do
+        merchant = create(:merchant, id: 1)
+        invoice = create(:invoice)
+
+        bulk_discount_a = create(:bulk_discount, percentage: 20, quantity: 10, merchant: merchant)
+        bulk_discount_b = create(:bulk_discount, percentage: 30, quantity: 15, merchant: merchant)
+
+        item_a = create(:item, merchant: merchant, unit_price: 1000)
+        item_b = create(:item, merchant: merchant, unit_price: 500)
+
+        inv_item_a = create(:invoice_item, quantity: 12, unit_price: item_a.unit_price, invoice: invoice, merchant: merchant)
+        inv_item_b = create(:invoice_item, quantity:15, unit_price: item_b.unit_price, invoice: invoice, merchant: merchant)
         
-        expect(invoices[0].total_invoice_revenue).to eq(3000)
-        expect(invoices[1].total_invoice_revenue).to eq(12000)
-        expect(invoices[2].total_invoice_revenue).to eq(27000)
+        expect(invoice.total_best_discount_amount_for_merchant(merchant.id)).to eq(4650)
+      end
+
+      it 'calculates the total of the best discounts if there are multiple merchants on the invoice' do
+        merchants = create_list(:merchant, 2)
+        invoice = create(:invoice)
+
+        bulk_discount_a = create(:bulk_discount, percentage: 20, quantity: 10, merchant: merchants[0])
+        bulk_discount_b = create(:bulk_discount, percentage: 30, quantity: 15, merchant: merchants[0])
+        bulk_discount_c = create(:bulk_discount, percentage: 30, quantity: 17, merchant: merchants[1])
+
+        item_a1 = create(:item, merchant: merchants[0], unit_price: 5000)
+        item_a2 = create(:item, merchant: merchants[0], unit_price: 700)
+        item_a3 = create(:item, merchant: merchants[0], unit_price: 1000)
+        item_a4 = create(:item, merchant: merchants[0], unit_price: 1000)
+        item_b = create(:item, merchant: merchants[1], unit_price: 1500)
+
+        inv_item_a1 = create(:invoice_item, quantity: 12, unit_price: item_a1.unit_price, invoice: invoice, merchant: merchants[0])
+        inv_item_a2 = create(:invoice_item, quantity: 15, unit_price: item_a2.unit_price, invoice: invoice, merchant: merchants[0])
+        inv_item_a3 = create(:invoice_item, quantity: 9, unit_price: item_a3.unit_price, invoice: invoice, merchant: merchants[0])
+        inv_item_a4 = create(:invoice_item, quantity: 10, unit_price: item_a4.unit_price, invoice: invoice, merchant: merchants[0])
+        inv_item_b = create(:invoice_item, quantity: 15, unit_price: item_b.unit_price, invoice: invoice, merchant: merchants[1])
+
+    
+        expect(invoice.total_best_discount_amount_for_merchant(merchants[0].id)).to eq(17150)
+        expect(invoice.total_best_discount_amount_for_merchant(merchants[1].id)).to eq(0)
+      end
+    end
+
+    describe '#total_discounted_revenue_for_merchant' do
+      it 'calculates the total discounted revenue for a merchant' do
+        merchants = create_list(:merchant, 2)
+        invoice = create(:invoice)
+
+        bulk_discount_a = create(:bulk_discount, percentage: 20, quantity: 10, merchant: merchants[0])
+        bulk_discount_b = create(:bulk_discount, percentage: 30, quantity: 15, merchant: merchants[0])
+        bulk_discount_c = create(:bulk_discount, percentage: 30, quantity: 17, merchant: merchants[1])
+
+        item_a1 = create(:item, merchant: merchants[0], unit_price: 5000)
+        item_a2 = create(:item, merchant: merchants[0], unit_price: 700)
+        item_a3 = create(:item, merchant: merchants[0], unit_price: 1000)
+        item_a4 = create(:item, merchant: merchants[0], unit_price: 1000)
+        item_b = create(:item, merchant: merchants[1], unit_price: 1500)
+
+        inv_item_a1 = create(:invoice_item, quantity: 12, unit_price: item_a1.unit_price, invoice: invoice, merchant: merchants[0])
+        inv_item_a2 = create(:invoice_item, quantity: 15, unit_price: item_a2.unit_price, invoice: invoice, merchant: merchants[0])
+        inv_item_a3 = create(:invoice_item, quantity: 9, unit_price: item_a3.unit_price, invoice: invoice, merchant: merchants[0])
+        inv_item_a4 = create(:invoice_item, quantity: 10, unit_price: item_a4.unit_price, invoice: invoice, merchant: merchants[0])
+        inv_item_b = create(:invoice_item, quantity: 15, unit_price: item_b.unit_price, invoice: invoice, merchant: merchants[1])
+
+
+        expect(invoice.total_discounted_revenue_for_merchant(merchants[0].id)).to eq(72350)
       end
     end
 
@@ -177,31 +248,25 @@ RSpec.describe Invoice, type: :model do
       expect(invoices[1].total_invoice_revenue_dollars).to eq(120.00)
       expect(invoices[2].total_invoice_revenue_dollars).to eq(270.00)
     end
+  
 
-    it 'can tell which of its invoice items are eligible for a discount' do
-      merchant = create(:merchant)
-      bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
-      item = create(:item, merchant: merchant, unit_price: 500)
-      invoice = create(:invoice)
-      inv_items_eligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 2, unit_price: item.unit_price)
-      inv_items_ineligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 1, unit_price: item.unit_price)
-      
-      expect(invoice.discounted_inv_items).to include(inv_items_eligible[0])
-      expect(invoice.discounted_inv_items).to include(inv_items_eligible[1])
-      expect(invoice.discounted_inv_items).to include(inv_items_eligible[2])
-      expect(invoice.discounted_inv_items).to_not include(inv_items_ineligible[2])
-    end
+    describe ("#discount_amount") do
 
-    it 'calculates the total invoice discount' do
-      merchant = create(:merchant)
-      bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
-      item = create(:item, merchant: merchant, unit_price: 500)
-      invoice = create(:invoice)
-      inv_items_eligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 3, unit_price: item.unit_price)
-      inv_items_ineligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 1, unit_price: item.unit_price)
-      
-      
-      expect(invoice.discount_amount).to eq(450)
+      it 'calculates the total invoice discount' do
+        merchant = create(:merchant)
+        bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
+        item = create(:item, merchant: merchant, unit_price: 500)
+        invoice = create(:invoice)
+        inv_items_eligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 3, unit_price: item.unit_price)
+        inv_items_ineligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 1, unit_price: item.unit_price)
+        
+        
+        expect(invoice.discount_amount).to eq(450)
+      end
+
+
+
+
     end
 
     it 'can tell what its discounted revenue is' do

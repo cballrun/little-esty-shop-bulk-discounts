@@ -33,15 +33,26 @@ class Invoice < ApplicationRecord
     .order(:created_at)
   end
 
-  def total_invoice_revenue
+  def total_invoice_revenue_for_merchant(merchant_id)
     items
     .joins(:invoice_items)
+    .where("items.merchant_id = ?", merchant_id)
     .sum("invoice_items.unit_price * invoice_items.quantity")
   end
 
-  def discounted_inv_items
-   invoice_items.eligible_for_discount
+  def total_best_discount_amount_for_merchant(merchant_id)
+    invoice_items
+    .joins(:bulk_discounts)
+    .where("invoice_items.quantity >= bulk_discounts.quantity AND bulk_discounts.merchant_id = ?", merchant_id)
+    .select("invoice_items.*, max(invoice_items.quantity *invoice_items.unit_price * (bulk_discounts.percentage/100.00)) as discount_amount")
+    .group(:id)
+    .sum(&:discount_amount)
   end
+
+  def total_discounted_revenue_for_merchant(merchant_id)
+    total_invoice_revenue_for_merchant(merchant_id) - total_best_discount_amount_for_merchant(merchant_id)
+  end
+
 
   def discount_amount
      invoice_items
@@ -57,6 +68,6 @@ class Invoice < ApplicationRecord
   end
 
   def total_invoice_revenue_dollars 
-    total_invoice_revenue.to_f / 100
+    total_revenue.to_f / 100
   end
 end

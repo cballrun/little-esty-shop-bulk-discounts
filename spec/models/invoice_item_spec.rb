@@ -16,7 +16,7 @@ RSpec.describe InvoiceItem, type: :model do
     it { should belong_to :item}
     it { should belong_to :invoice}
     it { should have_one(:merchant).through(:item)}
-    it { should have_one(:bulk_discounts).through(:merchant)}
+    it { should have_many(:bulk_discounts).through(:merchant)}
   end
 
   it 'instantiates with factorybot' do
@@ -62,8 +62,8 @@ RSpec.describe InvoiceItem, type: :model do
     #   end
     # end
 
-    describe '#eligible_for_discount?' do
-      it 'can tell if an invoice item is eligible for a discount' do
+    describe '#self.invoice_items_eligible_for_discount' do
+      it 'can tell which invoice items are eligible for a discount' do
         merchant = create(:merchant)
         bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
         item = create(:item, merchant: merchant, unit_price: 500)
@@ -71,10 +71,60 @@ RSpec.describe InvoiceItem, type: :model do
         inv_items_eligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 2, unit_price: item.unit_price)
         inv_items_ineligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 1, unit_price: item.unit_price)
 
-        expect(InvoiceItem.eligible_for_discount).to eq(inv_items_eligible)
+        expect(InvoiceItem.invoice_items_eligible_for_discount).to eq(inv_items_eligible)
       end
 
-      describe '#eligible_for_discount?' do
+      it 'can tell which invoice items are not eligible for a discount' do
+        merchant = create(:merchant)
+        bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 20, quantity: 10)
+        items = create_list(:item, 2, merchant: merchant)
+        invoice = create(:invoice)
+        inv_item_a = create(:invoice_item, quantity: 5, item: items[0])
+        inv_item_b = create(:invoice_item, quantity: 5, item: items[1])
+       
+        expect(InvoiceItem.invoice_items_eligible_for_discount).to eq([])
+      end
+
+      it 'can discount one item but not another' do
+        merchant = create(:merchant)
+        bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 20, quantity: 10)
+        items = create_list(:item, 2, merchant: merchant)
+        invoice = create(:invoice)
+        inv_item_a = create(:invoice_item, quantity: 10, item: items[0])
+        inv_item_b = create(:invoice_item, quantity: 5, item: items[1])
+      
+        expect(InvoiceItem.invoice_items_eligible_for_discount).to eq([inv_item_a])
+      end
+
+      describe "#invoice_item_best_discount" do
+
+        it 'can tell what the bulk discount id of the best bulk discount is' do
+          merchant = create(:merchant)
+          invoice = create(:invoice)
+          
+          bulk_discount_a = create(:bulk_discount, merchant: merchant, percentage: 20, quantity: 10)
+          bulk_discount_b = create(:bulk_discount, merchant: merchant, percentage: 30, quantity: 15)
+          
+          item_a = create(:item, merchant: merchant)
+          item_b = create(:item, merchant: merchant)
+          item_c = create(:item, merchant: merchant)
+         
+          inv_item_a = create(:invoice_item, quantity: 12, item: item_a, invoice: invoice)
+          inv_item_b = create(:invoice_item, quantity: 15, item: item_b, invoice: invoice)
+          inv_item_c = create(:invoice_item, quantity: 2, item: item_c, invoice: invoice)
+
+          expect(inv_item_a.invoice_item_best_discount).to eq(bulk_discount_a.id)
+          expect(inv_item_b.invoice_item_best_discount).to eq(bulk_discount_b.id)
+          expect(inv_item_c.invoice_item_best_discount).to eq(nil)
+        end
+      end
+
+
+
+
+
+
+      describe '#eligible_for_discount?' do 
         it 'can tell if an invoice item is eligible for a discount' do
           merchant = create(:merchant)
           bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
