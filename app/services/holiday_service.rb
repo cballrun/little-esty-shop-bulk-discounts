@@ -5,7 +5,6 @@ class HolidayService
     response = HTTParty.get(uri)
     body = response.body
     parsed = JSON.parse(body, symbolize_names: true)
-    binding.pry
   end
 
 
