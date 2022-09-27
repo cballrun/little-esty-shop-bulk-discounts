@@ -54,10 +54,6 @@ class Invoice < ApplicationRecord
   end
 
 
-  def discounted_inv_items ###needs to be fixed
-   invoice_items.eligible_for_discount
-  end
-
   def discount_amount
      invoice_items
     .joins(:bulk_discounts)

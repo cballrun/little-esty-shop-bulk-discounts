@@ -251,19 +251,6 @@ RSpec.describe Invoice, type: :model do
   
 
     describe ("#discount_amount") do
-      xit 'can tell which of its invoice items are eligible for a discount' do
-        merchant = create(:merchant)
-        bulk_discount = create(:bulk_discount, merchant: merchant, percentage: 10, quantity: 2)
-        item = create(:item, merchant: merchant, unit_price: 500)
-        invoice = create(:invoice)
-        inv_items_eligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 2, unit_price: item.unit_price)
-        inv_items_ineligible = create_list(:invoice_item, 3, item: item, invoice: invoice, quantity: 1, unit_price: item.unit_price)
-        
-        expect(invoice.discounted_inv_items).to include(inv_items_eligible[0])
-        expect(invoice.discounted_inv_items).to include(inv_items_eligible[1])
-        expect(invoice.discounted_inv_items).to include(inv_items_eligible[2])
-        expect(invoice.discounted_inv_items).to_not include(inv_items_ineligible[2])
-      end
 
       it 'calculates the total invoice discount' do
         merchant = create(:merchant)
